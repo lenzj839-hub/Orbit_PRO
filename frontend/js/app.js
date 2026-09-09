@@ -19,7 +19,22 @@ function renderCard(){
   $("card").innerHTML="<div class='shade'><h2>" + esc(u.name) + ", " + u.age + " ✓</h2><p>" + esc(u.city || "") + "</p><p>" + esc(u.bio || "") + "</p><button class='ghost' onclick='reportUser(" + u.id + ")'>🚨 Report</button><button class='ghost' onclick='blockUser(" + u.id + ")'>Block</button></div>";
 }
 $("pass").onclick=()=>{queue.shift();renderCard()}
-$("like").onclick=async()=>{const u=queue[0];if(!u)return;try{const d=await api("/api/like/"+u.id,{method:"POST"});queue.shift();renderCard();if(d.matched)alert("❤️ It's a match!")}catch(e){alert(e.message)}}
+$("like").onclick=async()=>{
+  const u=queue[0];
+  if(!u)return;
+
+  try{
+    const d=await api("/api/like/"+u.id,{method:"POST"});
+    queue.shift();
+    renderCard();
+
+    if(d.matched){
+      showMatchPopup(u.name);
+    }
+  }catch(e){
+    alert(e.message);
+  }
+}
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));$(b.dataset.page).classList.remove("hidden");if(b.dataset.page==="matches")loadMatches()})
 async function loadMatches(){const d=await api("/api/matches");$("matchList").innerHTML=d.matches.length?d.matches.map(m=>`<div class="match"><span>❤️ ${esc(m.user.name)}</span><button onclick='openChat(${m.id},${JSON.stringify(m.user.name)})'>Chat</button></div>`).join(""):"<p class='small'>No matches yet.</p>"}
 async function loadProfile(){const d=await api("/api/me");me=d.user;for(const [id,k] of [["pName","name"],["pAge","age"],["pCity","city"],["pPhoto","photo_url"],["pBio","bio"]])$(id).value=me[k]||""}
@@ -32,3 +47,69 @@ async function blockUser(id){if(confirm("Block this person?")){await api("/api/b
 async function reportUser(id){const reason=prompt("Reason for report:","Safety violation");if(reason){await api("/api/report/"+id,{method:"POST",body:JSON.stringify({reason})});await blockUser(id);alert("Report submitted and user blocked.")}}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 if(token){api("/api/me").then(d=>{me=d.user;showApp()}).catch(()=>{token=null;localStorage.removeItem("orbit_token");showAuth()})}else showAuth();
+
+/* ORBIT PRO DISCOVER AUTO-REFRESH */
+
+let discoverRefreshing=false;
+
+async function refreshDiscover(){
+  if(discoverRefreshing) return;
+  discoverRefreshing=true;
+
+  try{
+    const d=await api("/api/discover");
+    queue=d.users || [];
+    renderCard();
+  }catch(e){
+    console.error("Discover refresh failed:",e);
+  }finally{
+    discoverRefreshing=false;
+  }
+}
+
+/* Refresh profiles when returning to Discover */
+document.querySelectorAll(".nav").forEach(b=>{
+  if(b.dataset.page==="discover"){
+    b.addEventListener("click",()=>{
+      refreshDiscover();
+    });
+  }
+});
+
+/* Refresh Discover periodically */
+setInterval(()=>{
+  if(
+    token &&
+    !$("app").classList.contains("hidden") &&
+    !$("discover").classList.contains("hidden")
+  ){
+    refreshDiscover();
+  }
+},30000);
+
+
+/* ORBIT PRO MATCH POPUP */
+
+function showMatchPopup(name){
+  const old=document.querySelector(".orbit-match-popup");
+  if(old) old.remove();
+
+  const popup=document.createElement("div");
+  popup.className="orbit-match-popup";
+
+  popup.innerHTML=
+    "<div class='orbit-match-box'>" +
+      "<div class='heart'>❤️</div>" +
+      "<h2>It's a Match!</h2>" +
+      "<p>You and <strong>" + esc(name) + "</strong> liked each other.</p>" +
+      "<button id='matchContinue'>Continue</button>" +
+    "</div>";
+
+  document.body.appendChild(popup);
+
+  $("matchContinue").onclick=()=>{
+    popup.remove();
+    loadMatches();
+  };
+}
+
