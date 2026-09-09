@@ -1,0 +1,1 @@
+Replace/add proper Android app icons before Play Store release.

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#ff2e7a">
+<title>Orbit PRO</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main class="app">
+<header><strong>ORBIT <span>PRO</span> ❤️</strong><button id="logout" class="ghost hidden">Log out</button></header>
+
+<section id="auth">
+  <div class="hero"><h1>Meet people. Match safely.</h1><p>Real accounts, real matches, built with safety first.</p></div>
+  <div class="panel">
+    <div class="tabs"><button id="loginTab" class="active">Login</button><button id="registerTab">Create account</button></div>
+    <form id="authForm">
+      <input id="name" placeholder="Name" class="registerOnly hidden">
+      <input id="age" type="number" min="18" placeholder="Age (18+)" class="registerOnly hidden">
+      <input id="city" placeholder="City" class="registerOnly hidden">
+      <input id="email" type="email" placeholder="Email" required>
+      <input id="password" type="password" placeholder="Password (8+ characters)" required>
+      <button class="primary">Continue</button>
+    </form>
+    <p id="authMsg" class="msg"></p>
+  </div>
+</section>
+
+<section id="app" class="hidden">
+  <div class="safety">⚠️ Never share passwords, phone numbers, M-Pesa details or intimate images. Report suspicious requests.</div>
+  <nav><button data-page="discover" class="nav active">Discover</button><button data-page="matches" class="nav">Matches</button><button data-page="profile" class="nav">Profile</button></nav>
+
+  <div id="discover" class="page">
+    <div id="card" class="card"></div>
+    <div class="actions"><button id="pass" class="round">✕</button><button id="like" class="round pink">❤️</button></div>
+  </div>
+
+  <div id="matches" class="page hidden"><h2>Your Matches</h2><div id="matchList"></div></div>
+
+  <div id="profile" class="page hidden">
+    <h2>Your Profile</h2>
+    <form id="profileForm" class="panel">
+      <input id="pName" required><input id="pAge" type="number" min="18" required>
+      <input id="pCity"><input id="pPhoto" placeholder="Photo URL">
+      <textarea id="pBio" placeholder="Tell people about yourself"></textarea>
+      <button class="primary">Save profile</button>
+    </form>
+    <p class="small">For a public launch, connect an object-storage/image-upload service instead of accepting arbitrary image URLs.</p>
+  </div>
+
+  <div id="chat" class="page hidden">
+    <button id="backMatches" class="ghost">← Matches</button>
+    <h2 id="chatTitle"></h2>
+    <div id="messages" class="messages"></div>
+    <form id="messageForm" class="composer"><input id="message" placeholder="Write a safe message..." maxlength="1000"><button>Send</button></form>
+  </div>
+</section>
+</main>
+<script src="js/app.js?v=2"></script>
+</body>
+</html>

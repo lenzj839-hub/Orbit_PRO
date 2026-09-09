@@ -1,0 +1,3 @@
+-- Orbit PRO schema is created automatically by backend/src/db.js.
+-- This file documents the main entities:
+-- users, likes, matches, messages, blocks, reports.
