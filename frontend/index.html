@@ -44,7 +44,9 @@
       <input id="pName" required><input id="pAge" type="number" min="18" required>
       <input id="pCity"><input id="pPhoto" placeholder="Photo URL">
       <textarea id="pBio" placeholder="Tell people about yourself"></textarea>
-      <button class="primary">Save profile</button>
+   <label>Profile picture</label>
+<input id="profilePhoto" type="file" accept="image/*">
+<img id="profilePhotoPreview" style="max-width:120px;border-radius:50%;display:block;margin:10px auto;">   <button class="primary">Save profile</button>
     </form>
     <p class="small">For a public launch, connect an object-storage/image-upload service instead of accepting arbitrary image URLs.</p>
   </div>
