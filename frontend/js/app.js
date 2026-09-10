@@ -38,7 +38,16 @@ $("like").onclick=async()=>{
 document.querySelectorAll(".nav").forEach(b=>b.onclick=()=>{document.querySelectorAll(".nav").forEach(x=>x.classList.remove("active"));b.classList.add("active");document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));$(b.dataset.page).classList.remove("hidden");if(b.dataset.page==="matches")loadMatches()})
 async function loadMatches(){const d=await api("/api/matches");$("matchList").innerHTML=d.matches.length?d.matches.map(m=>`<div class="match"><span>❤️ ${esc(m.user.name)}</span><button onclick='openChat(${m.id},${JSON.stringify(m.user.name)})'>Chat</button></div>`).join(""):"<p class='small'>No matches yet.</p>"}
 async function loadProfile(){const d=await api("/api/me");me=d.user;for(const [id,k] of [["pName","name"],["pAge","age"],["pCity","city"],["pPhoto","photo_url"],["pBio","bio"]])$(id).value=me[k]||""}
-$("profileForm").onsubmit=async e=>{e.preventDefault();await api("/api/me",{method:"PUT",body:JSON.stringify({name:$("pName").value,age:Number($("pAge").value),city:$("pCity").value,photo_url:$("pPhoto").value,bio:$("pBio").value})});alert("Profile saved")}
+$("profilePhoto").onchange=e=>{
+const file=e.target.files[0];
+if(!file)return;
+const reader=new FileReader();
+reader.onload=()=>{
+$("pPhoto").value=reader.result;
+$("profilePhotoPreview").src=reader.result;
+};
+reader.readAsDataURL(file);
+};$("profileForm").onsubmit=async e=>{e.preventDefault();await api("/api/me",{method:"PUT",body:JSON.stringify({name:$("pName").value,age:Number($("pAge").value),city:$("pCity").value,photo_url:$("pPhoto").value,bio:$("pBio").value})});alert("Profile saved")}
 async function openChat(id,name){currentMatch=id;$("chatTitle").textContent="Chat with "+name;document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));$("chat").classList.remove("hidden");await loadMessages()}
 $("backMatches").onclick=()=>{$("chat").classList.add("hidden");$("matches").classList.remove("hidden");loadMatches()}
 async function loadMessages(){const d=await api("/api/messages/"+currentMatch);$("messages").innerHTML=d.messages.map(m=>`<div class="bubble ${m.sender_id===me.id?"mine":""}">${esc(m.body)}</div>`).join("");$("messages").scrollTop=$("messages").scrollHeight}
