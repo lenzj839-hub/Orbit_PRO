@@ -1,6 +1,6 @@
 let token=localStorage.getItem("orbit_token"), me=null, queue=[], currentMatch=null, register=false;
 const $=id=>document.getElementById(id);
-async function api(url,opt={}){opt.headers={...(opt.headers||{}), "Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{})};const r=await fetch("http://localhost:3000"+url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
+async function api(url,opt={}){opt.headers={...(opt.headers||{}), "Content-Type":"application/json",...(token?{Authorization:`Bearer ${token}`}:{})};const r=await fetch(url,opt);const d=await r.json().catch(()=>({}));if(!r.ok)throw Error(d.error||"Request failed");return d}
 function setMsg(x){$("authMsg").textContent=x}
 function showApp(){ $("auth").classList.add("hidden");$("app").classList.remove("hidden");$("logout").classList.remove("hidden"); loadDiscover(); loadProfile()}
 function showAuth(){ $("auth").classList.remove("hidden");$("app").classList.add("hidden");$("logout").classList.add("hidden")}
